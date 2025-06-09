@@ -1,9 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  return NextResponse.json({ message: "hello get" });
+  try {
+    const todos = await prisma.todo.findMany();
+    return NextResponse.json({ todos });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "todoの取得に失敗しました" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
-  return NextResponse.json({ message: "hello post" });
+  try {
+    const { title } = await req.json();
+    const todo = await prisma.todo.create({
+      data: {
+        title,
+      },
+    });
+    return NextResponse.json({ message: "success", todo });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "todoの作成に失敗しました" },
+      { status: 500 }
+    );
+  }
 }
