@@ -1,14 +1,9 @@
 import React from "react";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import TodoItem from "./TodoItem";
 
 function TodoInput() {
   return (
@@ -28,10 +23,8 @@ function TodoInput() {
       </CardContent>
       <CardContent>
         <p>タスクがありません。</p>
+        <TodoItem>Todo</TodoItem>
       </CardContent>
-      <CardFooter>
-        <p>Card Footer</p>
-      </CardFooter>
     </Card>
   );
 }
