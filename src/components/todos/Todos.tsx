@@ -3,14 +3,28 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import TodoItem from "./TodoItem";
+import TodoList from "./TodoList";
+import If from "../utils/If";
+import Unless from "../utils/Unless";
 
-function TodoInput() {
+async function Todos() {
+  // Server Component内でFetchする
+  const res = await fetch("http://localhost:3000/api/todos");
+  if (!res.ok) {
+    alert("todosの取得に失敗しました");
+  }
+
+  const { todos } = await res.json();
+  const hasTodos = todos.length > 0;
+
   return (
     <Card className="max-w-[600px] mx-auto my-10">
       <CardHeader>
         <CardTitle className="text-3xl bold">TODOリスト</CardTitle>
       </CardHeader>
+
+      {/* AddTodoForm Client Component */}
+      {/* 再レンダリングはできる限り末端で行う */}
       <CardContent className="flex w-full items-center gap-2 py-6">
         <Input className="h-12 text-lg" />
         <Button
@@ -21,12 +35,18 @@ function TodoInput() {
           追加
         </Button>
       </CardContent>
+
+      {/* TODO List */}
       <CardContent>
-        <p>タスクがありません。</p>
-        <TodoItem>Todo</TodoItem>
+        <If condition={hasTodos}>
+          <TodoList todos={todos} />
+        </If>
+        <Unless condition={hasTodos}>
+          <p>タスクがありません。</p>
+        </Unless>
       </CardContent>
     </Card>
   );
 }
 
-export default TodoInput;
+export default Todos;

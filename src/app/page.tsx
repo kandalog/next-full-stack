@@ -1,9 +1,5 @@
-import TodoInput from "@/components/todos/TodoInput";
+import Todos from "@/components/todos/Todos";
 
 export default function Home() {
-  return (
-    <>
-      <TodoInput />
-    </>
-  );
+  return <Todos />;
 }
