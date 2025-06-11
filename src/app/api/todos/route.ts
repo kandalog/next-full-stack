@@ -15,6 +15,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   try {
     const { title } = await req.json();
     const todo = await prisma.todo.create({
