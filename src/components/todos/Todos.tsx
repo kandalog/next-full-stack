@@ -7,7 +7,8 @@ import TodoList from "./TodoList";
 import If from "../utils/If";
 import Unless from "../utils/Unless";
 
-async function Todos() {
+async function 
+Todos() {
   // Server Component内でFetchする
   const res = await fetch("http://localhost:3000/api/todos");
   if (!res.ok) {

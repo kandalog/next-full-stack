@@ -8,8 +8,10 @@ function Page() {
   const [loading, setIsLoading] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
 
+  // 初回表示時はLoadingが必要
   useEffect(() => {
-    fetchTodos();
+    setIsLoading(true)
+    fetchTodos().finally(() => setIsLoading(false))
   }, []);
 
   const fetchTodos = async () => {
@@ -18,8 +20,8 @@ function Page() {
     setTodos(data.todos);
   };
 
+  // 楽観的更新作業はここで行う
   const handleSubmit = async () => {
-    setIsLoading(true);
     try {
       const res = await fetch("/api/todos", {
         method: "POST",
@@ -31,8 +33,6 @@ function Page() {
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
