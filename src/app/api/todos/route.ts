@@ -17,6 +17,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   await new Promise((resolve) => setTimeout(resolve, 3000));
   try {
+    throw new Error('か失敗です')
     const { title } = await req.json();
     const todo = await prisma.todo.create({
       data: {
