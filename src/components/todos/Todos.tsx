@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { startTransition, useOptimistic, useState } from "react";
 
 import { BASE_URL } from "@/lib/config";
 import { Todo } from "@prisma/client";
@@ -17,6 +17,21 @@ function Todos({ initialTodos }: Props) {
   const [todos, setTodos] = useState(initialTodos);
   const [text, setText] = useState("");
 
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (state, newTodo: string) => {
+      const todo = {
+        id: Math.random() * 100,
+        title: newTodo,
+        completed: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        sending: true,
+      };
+      return [...state, todo];
+    }
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
@@ -28,24 +43,28 @@ function Todos({ initialTodos }: Props) {
   };
 
   const handleSubmit = async () => {
-    try {
-      const res = await fetch(BASE_URL + "/todos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title: text }),
-      });
+    startTransition(async () => {
+      addOptimisticTodo(text);
 
-      if (!res.ok) {
-        throw new Error("エラーが発生しました");
+      try {
+        const res = await fetch(BASE_URL + "/todos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title: text }),
+        });
+
+        if (!res.ok) {
+          throw new Error("エラーが発生しました");
+        }
+        const todos = await fetchTodos();
+        setTodos(todos);
+      } catch (err) {
+        console.error(err);
+        alert("エラーが発生しました");
       }
-      const todos = await fetchTodos();
-      setTodos(todos);
-    } catch (err) {
-      console.error(err);
-      alert("エラーが発生しました");
-    }
+    });
   };
 
   return (
@@ -57,7 +76,7 @@ function Todos({ initialTodos }: Props) {
         <InputArea text={text} onChange={handleChange} onClick={handleSubmit} />
       </CardContent>
       <CardContent>
-        <TodoList todos={todos} />
+        <TodoList todos={optimisticTodos} />
       </CardContent>
     </Card>
   );

@@ -1,11 +1,11 @@
-import { Todo } from "@prisma/client";
 import React from "react";
 import TodoItem from "./TodoItem";
 import If from "../utils/If";
 import Unless from "../utils/Unless";
+import { OptimisticTodo } from "@/app/test/todos.type";
 
 type Props = {
-  todos: Todo[];
+  todos: OptimisticTodo[];
 };
 
 function TodoList({ todos }: Props) {
@@ -14,8 +14,11 @@ function TodoList({ todos }: Props) {
   return (
     <>
       <If condition={hasTodos}>
-        {todos.map((todo: Todo) => (
-          <TodoItem key={todo.id}>{todo.title}</TodoItem>
+        {todos.map((todo: OptimisticTodo) => (
+          <TodoItem key={todo.id} sending={todo.sending}>
+            {todo.title}
+            {todo.sending ? <span className="ml-4">送信中...</span> : ""}
+          </TodoItem>
         ))}
       </If>
       <Unless condition={hasTodos}>
