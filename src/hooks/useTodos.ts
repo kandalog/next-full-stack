@@ -4,22 +4,27 @@ import React, { startTransition, useOptimistic, useState } from "react";
 import { BASE_URL } from "@/lib/config";
 import { Todo } from "@prisma/client";
 
+type OptimisticAction = { type: "create"; text: string };
+
 export const useTodos = (initialTodos: Todo[]) => {
   const [todos, setTodos] = useState(initialTodos);
   const [text, setText] = useState("");
 
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     todos,
-    (state, newTodo: string) => {
-      const todo = {
-        id: Math.random() * 100,
-        title: newTodo,
-        completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        sending: true,
-      };
-      return [...state, todo];
+    (state, action: OptimisticAction) => {
+      switch (action.type) {
+        case "create":
+          const todo = {
+            id: Math.random() * 100,
+            title: action.text,
+            completed: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            sending: true,
+          };
+          return [...state, todo];
+      }
     }
   );
 
@@ -29,7 +34,7 @@ export const useTodos = (initialTodos: Todo[]) => {
 
   const handleSubmit = async () => {
     startTransition(async () => {
-      addOptimisticTodo(text);
+      addOptimisticTodo({ type: "create", text });
 
       try {
         await createTodos();
