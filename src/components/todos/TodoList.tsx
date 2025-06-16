@@ -2,7 +2,7 @@ import React from "react";
 import TodoItem from "./TodoItem";
 import If from "../utils/If";
 import Unless from "../utils/Unless";
-import { OptimisticTodo } from "@/app/test/todos.type";
+import { OptimisticTodo } from "@/types/todos.type";
 
 type Props = {
   todos: OptimisticTodo[];
