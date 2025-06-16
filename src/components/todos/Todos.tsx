@@ -1,50 +1,63 @@
-import React from "react";
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import React, { useState } from "react";
+
+import { BASE_URL } from "@/lib/config";
+import { Todo } from "@prisma/client";
+
 import TodoList from "./TodoList";
-import If from "../utils/If";
-import Unless from "../utils/Unless";
+import InputArea from "./InputArea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-async function 
-Todos() {
-  // Server Component内でFetchする
-  const res = await fetch("http://localhost:3000/api/todos");
-  if (!res.ok) {
-    alert("todosの取得に失敗しました");
-  }
+type Props = {
+  initialTodos: Todo[];
+};
 
-  const { todos } = await res.json();
-  const hasTodos = todos.length > 0;
+function Todos({ initialTodos }: Props) {
+  const [todos, setTodos] = useState(initialTodos);
+  const [text, setText] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+  };
+
+  const fetchTodos = async () => {
+    const res = await fetch(BASE_URL + "/todos");
+    const data = await res.json();
+    return data.todos;
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch(BASE_URL + "/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: text }),
+      });
+
+      if (!res.ok) {
+        throw new Error("エラーが発生しました");
+      }
+      const todos = await fetchTodos();
+      setTodos(todos);
+    } catch (err) {
+      console.error(err);
+      alert("エラーが発生しました");
+    }
+  };
 
   return (
     <Card className="max-w-[600px] mx-auto my-10">
       <CardHeader>
         <CardTitle className="text-3xl bold">TODOリスト</CardTitle>
       </CardHeader>
-
-      {/* AddTodoForm Client Component */}
-      {/* 再レンダリングはできる限り末端で行う */}
       <CardContent className="flex w-full items-center gap-2 py-6">
-        <Input className="h-12 text-lg" />
-        <Button
-          type="submit"
-          variant="outline"
-          className="bg-[#6366F1] text-white text-2xl h-12 px-6 hover:bg-[#6366F1] hover:text-white"
-        >
-          追加
-        </Button>
+        <InputArea text={text} onChange={handleChange} onClick={handleSubmit} />
       </CardContent>
-
-      {/* TODO List */}
       <CardContent>
-        <If condition={hasTodos}>
-          <TodoList todos={todos} />
-        </If>
-        <Unless condition={hasTodos}>
-          <p>タスクがありません。</p>
-        </Unless>
+        <TodoList todos={todos} />
       </CardContent>
     </Card>
   );
