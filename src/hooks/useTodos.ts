@@ -60,6 +60,7 @@ export const useTodos = (initialTodos: Todo[]) => {
 
       try {
         await createTodo(text);
+        setText("");
         const todos = await fetchTodos();
         setTodos(todos);
       } catch (err) {
