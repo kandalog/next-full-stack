@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const todo = await prisma.todo.findUnique({
       where: { id: Number(id) },
@@ -36,10 +36,10 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const todo = await prisma.todo.findUnique({
       where: { id: Number(id) },

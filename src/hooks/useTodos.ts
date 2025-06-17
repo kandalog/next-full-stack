@@ -1,8 +1,13 @@
 "use client";
 
 import React, { startTransition, useOptimistic, useState } from "react";
-import { BASE_URL } from "@/lib/config";
 import { Todo } from "@prisma/client";
+import {
+  createTodo,
+  deleteTodo,
+  fetchTodos,
+  updateTodo,
+} from "@/lib/api/todos";
 
 type OptimisticAction =
   | { type: "create"; text: string }
@@ -54,7 +59,7 @@ export const useTodos = (initialTodos: Todo[]) => {
       updateOptimisticTodos({ type: "create", text });
 
       try {
-        await createTodos();
+        await createTodo(text);
         const todos = await fetchTodos();
         setTodos(todos);
       } catch (err) {
@@ -69,17 +74,7 @@ export const useTodos = (initialTodos: Todo[]) => {
       updateOptimisticTodos({ type: "update", id });
 
       try {
-        const res = await fetch(BASE_URL + `/todos/${id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("エラーが発生しました");
-        }
-
+        await updateTodo(id);
         const todos = await fetchTodos();
         setTodos(todos);
       } catch (err) {
@@ -93,17 +88,7 @@ export const useTodos = (initialTodos: Todo[]) => {
     startTransition(async () => {
       updateOptimisticTodos({ type: "delete", id });
       try {
-        const res = await fetch(BASE_URL + `/todos/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("エラーが発生しました");
-        }
-
+        await deleteTodo(id);
         const todos = await fetchTodos();
         setTodos(todos);
       } catch (err) {
@@ -111,26 +96,6 @@ export const useTodos = (initialTodos: Todo[]) => {
         alert("エラーが発生しました");
       }
     });
-  };
-
-  const fetchTodos = async () => {
-    const res = await fetch(BASE_URL + "/todos");
-    const data = await res.json();
-    return data.todos;
-  };
-
-  const createTodos = async () => {
-    const res = await fetch(BASE_URL + "/todos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title: text }),
-    });
-
-    if (!res.ok) {
-      throw new Error("エラーが発生しました");
-    }
   };
 
   return {
