@@ -4,13 +4,15 @@ import React, { startTransition, useOptimistic, useState } from "react";
 import { BASE_URL } from "@/lib/config";
 import { Todo } from "@prisma/client";
 
-type OptimisticAction = { type: "create"; text: string };
+type OptimisticAction =
+  | { type: "create"; text: string }
+  | { type: "update"; id: number };
 
 export const useTodos = (initialTodos: Todo[]) => {
   const [todos, setTodos] = useState(initialTodos);
   const [text, setText] = useState("");
 
-  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+  const [optimisticTodos, updateOptimisticTodos] = useOptimistic(
     todos,
     (state, action: OptimisticAction) => {
       switch (action.type) {
@@ -24,6 +26,14 @@ export const useTodos = (initialTodos: Todo[]) => {
             sending: true,
           };
           return [...state, todo];
+        case "update":
+          const targetTodo = state.find((s) => s.id === action.id);
+          if (!targetTodo) {
+            return [...state];
+          }
+          return state.map((s) =>
+            s.id === action.id ? { ...s, completed: !s.completed } : s
+          );
       }
     }
   );
@@ -34,10 +44,35 @@ export const useTodos = (initialTodos: Todo[]) => {
 
   const handleSubmit = async () => {
     startTransition(async () => {
-      addOptimisticTodo({ type: "create", text });
+      updateOptimisticTodos({ type: "create", text });
 
       try {
         await createTodos();
+        const todos = await fetchTodos();
+        setTodos(todos);
+      } catch (err) {
+        console.error(err);
+        alert("エラーが発生しました");
+      }
+    });
+  };
+
+  const handleCheckChange = async (id: number) => {
+    startTransition(async () => {
+      updateOptimisticTodos({ type: "update", id });
+
+      try {
+        const res = await fetch(BASE_URL + `/todos/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("エラーが発生しました");
+        }
+
         const todos = await fetchTodos();
         setTodos(todos);
       } catch (err) {
@@ -67,5 +102,11 @@ export const useTodos = (initialTodos: Todo[]) => {
     }
   };
 
-  return { text, handleChange, handleSubmit, optimisticTodos };
+  return {
+    text,
+    handleChange,
+    handleSubmit,
+    optimisticTodos,
+    handleCheckChange,
+  };
 };

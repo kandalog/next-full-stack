@@ -6,16 +6,23 @@ import { OptimisticTodo } from "@/types/todos.type";
 
 type Props = {
   todos: OptimisticTodo[];
+  onCheckedChange: (id: number) => void;
 };
 
-function TodoList({ todos }: Props) {
+function TodoList({ todos, onCheckedChange }: Props) {
   const hasTodos = todos.length > 0;
 
   return (
     <>
       <If condition={hasTodos}>
         {todos.map((todo: OptimisticTodo) => (
-          <TodoItem key={todo.id} sending={todo.sending}>
+          <TodoItem
+            key={todo.id}
+            id={todo.id}
+            sending={todo.sending}
+            checked={todo.completed}
+            onCheckedChange={onCheckedChange}
+          >
             {todo.title}
             {todo.sending ? <span className="ml-4">送信中...</span> : ""}
           </TodoItem>

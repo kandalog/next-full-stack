@@ -2,13 +2,15 @@ import React from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Trash2 } from "lucide-react";
 
-function TodoItem({
-  children,
-  sending,
-}: {
+type Props = {
   children: React.ReactNode;
   sending: boolean | undefined;
-}) {
+  checked: boolean;
+  onCheckedChange: (id: number) => void;
+  id: number;
+};
+
+function TodoItem({ children, sending, checked, onCheckedChange, id }: Props) {
   return (
     <div
       className={`group flex items-center bg-gray-100 p-4 rounded-md space-x-4 [&:not(:first-child)]:mt-4 ${
@@ -16,6 +18,10 @@ function TodoItem({
       }`}
     >
       <Checkbox
+        checked={checked}
+        onCheckedChange={() => {
+          onCheckedChange(id);
+        }}
         className={`cursor-pointer rounded-full border-gray-300 border-2 ${
           sending ? "hidden" : ""
         }`}

@@ -12,8 +12,13 @@ type Props = {
 };
 
 function Todos({ initialTodos }: Props) {
-  const { text, handleChange, handleSubmit, optimisticTodos } =
-    useTodos(initialTodos);
+  const {
+    text,
+    handleChange,
+    handleSubmit,
+    optimisticTodos,
+    handleCheckChange,
+  } = useTodos(initialTodos);
 
   return (
     <Card className="max-w-[600px] mx-auto my-10">
@@ -24,7 +29,7 @@ function Todos({ initialTodos }: Props) {
         <InputArea text={text} onChange={handleChange} onClick={handleSubmit} />
       </CardContent>
       <CardContent>
-        <TodoList todos={optimisticTodos} />
+        <TodoList todos={optimisticTodos} onCheckedChange={handleCheckChange} />
       </CardContent>
     </Card>
   );
