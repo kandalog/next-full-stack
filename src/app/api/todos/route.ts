@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const todos = await prisma.todo.findMany();
+    const todos = await prisma.todo.findMany({
+      orderBy: {
+        id: "asc",
+      },
+    });
     return NextResponse.json({ todos });
   } catch (err) {
     console.error(err);
