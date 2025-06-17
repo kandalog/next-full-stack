@@ -7,9 +7,10 @@ import { OptimisticTodo } from "@/types/todos.type";
 type Props = {
   todos: OptimisticTodo[];
   onCheckedChange: (id: number) => void;
+  onClickDelete: (id: number) => void;
 };
 
-function TodoList({ todos, onCheckedChange }: Props) {
+function TodoList({ todos, onCheckedChange, onClickDelete }: Props) {
   const hasTodos = todos.length > 0;
 
   return (
@@ -22,6 +23,7 @@ function TodoList({ todos, onCheckedChange }: Props) {
             sending={todo.sending}
             checked={todo.completed}
             onCheckedChange={onCheckedChange}
+            onClickDelete={onClickDelete}
           >
             {todo.title}
             {todo.sending ? <span className="ml-4">送信中...</span> : ""}

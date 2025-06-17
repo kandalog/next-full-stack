@@ -6,7 +6,8 @@ import { Todo } from "@prisma/client";
 
 type OptimisticAction =
   | { type: "create"; text: string }
-  | { type: "update"; id: number };
+  | { type: "update"; id: number }
+  | { type: "delete"; id: number };
 
 export const useTodos = (initialTodos: Todo[]) => {
   const [todos, setTodos] = useState(initialTodos);
@@ -34,6 +35,12 @@ export const useTodos = (initialTodos: Todo[]) => {
           return state.map((s) =>
             s.id === action.id ? { ...s, completed: !s.completed } : s
           );
+        case "delete":
+          const deleteTodo = state.find((s) => s.id === action.id);
+          if (!deleteTodo) {
+            return [...state];
+          }
+          return state.filter((s) => action.id !== s.id);
       }
     }
   );
@@ -82,6 +89,30 @@ export const useTodos = (initialTodos: Todo[]) => {
     });
   };
 
+  const handleClickDelete = async (id: number) => {
+    startTransition(async () => {
+      updateOptimisticTodos({ type: "delete", id });
+      try {
+        const res = await fetch(BASE_URL + `/todos/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("エラーが発生しました");
+        }
+
+        const todos = await fetchTodos();
+        setTodos(todos);
+      } catch (err) {
+        console.error(err);
+        alert("エラーが発生しました");
+      }
+    });
+  };
+
   const fetchTodos = async () => {
     const res = await fetch(BASE_URL + "/todos");
     const data = await res.json();
@@ -108,5 +139,6 @@ export const useTodos = (initialTodos: Todo[]) => {
     handleSubmit,
     optimisticTodos,
     handleCheckChange,
+    handleClickDelete,
   };
 };

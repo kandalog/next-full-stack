@@ -18,6 +18,7 @@ function Todos({ initialTodos }: Props) {
     handleSubmit,
     optimisticTodos,
     handleCheckChange,
+    handleClickDelete,
   } = useTodos(initialTodos);
 
   return (
@@ -29,7 +30,11 @@ function Todos({ initialTodos }: Props) {
         <InputArea text={text} onChange={handleChange} onClick={handleSubmit} />
       </CardContent>
       <CardContent>
-        <TodoList todos={optimisticTodos} onCheckedChange={handleCheckChange} />
+        <TodoList
+          todos={optimisticTodos}
+          onCheckedChange={handleCheckChange}
+          onClickDelete={handleClickDelete}
+        />
       </CardContent>
     </Card>
   );
