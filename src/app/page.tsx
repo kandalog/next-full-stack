@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Todos from "@/components/todos/Todos";
 import { BASE_URL } from "@/lib/config";
 
