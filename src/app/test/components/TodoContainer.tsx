@@ -8,16 +8,11 @@ import InputArea from "./InputArea";
 import { useTodos } from "../useTodos";
 
 type Props = {
-  initialTodos: Todo[]
-}
+  initialTodos: Todo[];
+};
 
 function TodoContainer({ initialTodos }: Props) {
-  const {
-     text,
-     optimisticTodos,
-     handleClick,
-     handleChange
-  } = useTodos(initialTodos)
+  const { text, optimisticTodos, handleClick, handleChange } = useTodos(initialTodos);
 
   return (
     <div>

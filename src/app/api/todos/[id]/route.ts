@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -13,10 +10,7 @@ export async function PATCH(
     });
 
     if (!todo) {
-      return NextResponse.json(
-        { error: "todoが見つかりません" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "todoが見つかりません" }, { status: 404 });
     }
 
     await prisma.todo.update({
@@ -27,17 +21,11 @@ export async function PATCH(
     return NextResponse.json({ message: "success", todo });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "todoの更新に失敗しました" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "todoの更新に失敗しました" }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -46,10 +34,7 @@ export async function DELETE(
     });
 
     if (!todo) {
-      return NextResponse.json(
-        { error: "todoが見つかりません" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "todoが見つかりません" }, { status: 404 });
     }
 
     await prisma.todo.delete({
@@ -59,9 +44,6 @@ export async function DELETE(
     return NextResponse.json({ message: "success", todo });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "todoの削除に失敗しました" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "todoの削除に失敗しました" }, { status: 500 });
   }
 }
